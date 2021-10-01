@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class ConduitOnLandMixin {
 
     @Redirect(method = "givePlayersEffects", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isTouchingWaterOrRain()Z"))
-    private static boolean allowConduitPowerOnLand(PlayerEntity playerEntity) {
+    private boolean allowConduitPowerOnLand(PlayerEntity playerEntity) {
         return playerEntity.isTouchingWaterOrRain() || OriginsPowerTypes.CONDUIT_POWER_ON_LAND.isActive(playerEntity);
     }
 }

@@ -8,7 +8,7 @@ import io.github.apace100.origins.origin.Origin;
 import io.github.apace100.origins.origin.OriginLayer;
 import io.github.apace100.origins.util.PowerKeyManager;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.*;
@@ -91,7 +91,7 @@ public class OriginDisplayScreen extends Screen {
         if(!canScroll()) {
             return;
         }
-        RenderSystem.setShaderTexture(0, WINDOW);
+        client.getTextureManager().bindTexture(WINDOW);
         this.drawTexture(matrices, guiLeft + 155, guiTop + 35, 188, 24, 8, 134);
         int scrollbarY = 36;
         int maxScrollbarOffset = 141;
@@ -193,14 +193,14 @@ public class OriginDisplayScreen extends Screen {
         if(origin != null) {
             this.renderOriginContent(matrices, mouseX, mouseY);
         }
-        RenderSystem.setShaderTexture(0, WINDOW);
+        client.getTextureManager().bindTexture(WINDOW);
         this.drawTexture(matrices, guiLeft, guiTop, 0, 0, windowWidth, windowHeight);
         if(origin != null) {
             renderOriginName(matrices);
-            RenderSystem.setShaderTexture(0, WINDOW);
+            client.getTextureManager().bindTexture(WINDOW);
             this.renderOriginImpact(matrices, mouseX, mouseY);
             Text title = new TranslatableText(Origins.MODID + ".gui.choose_origin.title", new TranslatableText(layer.getTranslationKey()));
-            this.drawCenteredText(matrices, this.textRenderer, title.getString(), width / 2, guiTop - 15, 0xFFFFFF);
+            this.drawCenteredText(matrices, this.textRenderer, Text.of(title.getString()), width / 2, guiTop - 15, 0xFFFFFF);
         }
         RenderSystem.disableBlend();
     }
@@ -234,7 +234,7 @@ public class OriginDisplayScreen extends Screen {
         int border = 13;
         int endX = guiLeft + windowWidth - border;
         int endY = guiTop + windowHeight - border;
-        RenderSystem.setShaderTexture(0, WINDOW);
+        client.getTextureManager().bindTexture(WINDOW);
         for(int x = guiLeft; x < endX; x += 16) {
             for(int y = guiTop + offsetYStart; y < endY + offsetYEnd; y += 16) {
                 this.drawTexture(matrices, x, y, windowWidth, 0, Math.max(16, endX - x), Math.max(16, endY + offsetYEnd - y));
@@ -301,7 +301,7 @@ public class OriginDisplayScreen extends Screen {
                     int xStart = x + tw + 4;
                     int bi = 0;
                     for(Badge badge : badges) {
-                        RenderSystem.setShaderTexture(0, badge.getSpriteLocation());
+                        client.getTextureManager().bindTexture(badge.getSpriteLocation());
                         drawTexture(matrices, xStart + 10 * bi, y - 1, 0, 0, 9, 9, 9, 9);
                         RenderedBadge rb = new RenderedBadge();
                         rb.badge = badge;

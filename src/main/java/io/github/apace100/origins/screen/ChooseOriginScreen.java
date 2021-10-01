@@ -47,8 +47,8 @@ public class ChooseOriginScreen extends OriginDisplayScreen {
 			if(origin.isChoosable()) {
 				ItemStack displayItem = origin.getDisplayItem();
 				if(displayItem.getItem() == Items.PLAYER_HEAD) {
-					if(!displayItem.hasNbt() || !displayItem.getNbt().contains("SkullOwner")) {
-						displayItem.getOrCreateNbt().putString("SkullOwner", player.getDisplayName().getString());
+					if(!displayItem.hasTag() || !displayItem.getTag().contains("SkullOwner")) {
+						displayItem.getOrCreateTag().putString("SkullOwner", player.getDisplayName().getString());
 					}
 				}
 				this.originSelection.add(origin);
@@ -70,7 +70,7 @@ public class ChooseOriginScreen extends OriginDisplayScreen {
 	}
 
 	private void openNextLayerScreen() {
-		MinecraftClient.getInstance().setScreen(new WaitForNextLayerScreen(layerList, currentLayerIndex, this.showDirtBackground));
+		MinecraftClient.getInstance().openScreen(new WaitForNextLayerScreen(layerList, currentLayerIndex, this.showDirtBackground));
 	}
 
 	@Override
@@ -81,17 +81,17 @@ public class ChooseOriginScreen extends OriginDisplayScreen {
 	@Override
 	protected void init() {
 		super.init();
-		addDrawableChild(new ButtonWidget(guiLeft - 40,this.height / 2 - 10, 20, 20, new LiteralText("<"), b -> {
+		addButton(new ButtonWidget(guiLeft - 40,this.height / 2 - 10, 20, 20, new LiteralText("<"), b -> {
         	currentOrigin = (currentOrigin - 1 + maxSelection) % maxSelection;
 			Origin newOrigin = getCurrentOriginInternal();
 			showOrigin(newOrigin, layerList.get(currentLayerIndex), newOrigin == randomOrigin);
         }));
-		addDrawableChild(new ButtonWidget(guiLeft + windowWidth + 20, this.height / 2 - 10, 20, 20, new LiteralText(">"), b -> {
+		addButton(new ButtonWidget(guiLeft + windowWidth + 20, this.height / 2 - 10, 20, 20, new LiteralText(">"), b -> {
         	currentOrigin = (currentOrigin + 1) % maxSelection;
 			Origin newOrigin = getCurrentOriginInternal();
 			showOrigin(newOrigin, layerList.get(currentLayerIndex), newOrigin == randomOrigin);
         }));
-		addDrawableChild(new ButtonWidget(guiLeft + windowWidth / 2 - 50, guiTop + windowHeight + 5, 100, 20, new TranslatableText(Origins.MODID + ".gui.select"), b -> {
+		addButton(new ButtonWidget(guiLeft + windowWidth / 2 - 50, guiTop + windowHeight + 5, 100, 20, new TranslatableText(Origins.MODID + ".gui.select"), b -> {
 			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 			if(currentOrigin == originSelection.size()) {
 				buf.writeString(layerList.get(currentLayerIndex).getIdentifier().toString());

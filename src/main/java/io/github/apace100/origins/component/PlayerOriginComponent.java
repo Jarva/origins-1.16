@@ -9,9 +9,9 @@ import io.github.apace100.origins.origin.OriginLayer;
 import io.github.apace100.origins.origin.OriginLayers;
 import io.github.apace100.origins.origin.OriginRegistry;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
@@ -26,7 +26,7 @@ public class PlayerOriginComponent implements OriginComponent {
 
     private boolean hadOriginBefore = false;
 
-    private NbtCompound cachedData;
+    private CompoundTag cachedData;
 
     public PlayerOriginComponent(PlayerEntity player) {
         this.player = player;
@@ -95,7 +95,7 @@ public class PlayerOriginComponent implements OriginComponent {
     }
 
     @Override
-    public void readFromNbt(NbtCompound compoundTag) {
+    public void readFromNbt(CompoundTag compoundTag) {
         this.cachedData = compoundTag;
     }
 
@@ -109,7 +109,8 @@ public class PlayerOriginComponent implements OriginComponent {
         }
     }
 
-    private void fromTag(NbtCompound compoundTag) {
+    @Override
+    public void fromTag(CompoundTag compoundTag) {
 
         if(player == null) {
             Origins.LOGGER.error("Player was null in `fromTag`! This is a bug!");
@@ -125,10 +126,10 @@ public class PlayerOriginComponent implements OriginComponent {
                 Origins.LOGGER.warn("Player " + player.getDisplayName().asString() + " had old origin which could not be migrated: " + compoundTag.getString("Origin"));
             }
         } else {
-            NbtList originLayerList = (NbtList)compoundTag.get("OriginLayers");
+            ListTag originLayerList = (ListTag) compoundTag.get("OriginLayers");
             if(originLayerList != null) {
                 for(int i = 0; i < originLayerList.size(); i++) {
-                    NbtCompound layerTag = originLayerList.getCompound(i);
+                    CompoundTag layerTag = originLayerList.getCompound(i);
                     Identifier layerId = Identifier.tryParse(layerTag.getString("Layer"));
                     OriginLayer layer = null;
                     try {
@@ -176,14 +177,14 @@ public class PlayerOriginComponent implements OriginComponent {
             // Loads power data from Origins tag, whereas new versions
             // store the data in the Apoli tag.
             if(compoundTag.contains("Powers")) {
-                NbtList powerList = (NbtList)compoundTag.get("Powers");
+                ListTag powerList = (ListTag) compoundTag.get("Powers");
                 for(int i = 0; i < powerList.size(); i++) {
-                    NbtCompound powerTag = powerList.getCompound(i);
+                    CompoundTag powerTag = powerList.getCompound(i);
                     Identifier powerTypeId = Identifier.tryParse(powerTag.getString("Type"));
                     try {
                         PowerType<?> type = PowerTypeRegistry.get(powerTypeId);
                         if(powerComponent.hasPower(type)) {
-                            NbtElement data = powerTag.get("Data");
+                            Tag data = powerTag.get("Data");
                             try {
                                 powerComponent.getPower(type).fromTag(data);
                             } catch(ClassCastException e) {
@@ -201,10 +202,10 @@ public class PlayerOriginComponent implements OriginComponent {
     }
 
     @Override
-    public void writeToNbt(NbtCompound compoundTag) {
-        NbtList originLayerList = new NbtList();
+    public void writeToNbt(CompoundTag compoundTag) {
+        ListTag originLayerList = new ListTag();
         for(Map.Entry<OriginLayer, Origin> entry : origins.entrySet()) {
-            NbtCompound layerTag = new NbtCompound();
+            CompoundTag layerTag = new CompoundTag();
             layerTag.putString("Layer", entry.getKey().getIdentifier().toString());
             layerTag.putString("Origin", entry.getValue().getIdentifier().toString());
             originLayerList.add(layerTag);
@@ -215,7 +216,7 @@ public class PlayerOriginComponent implements OriginComponent {
 
     @Override
     public void applySyncPacket(PacketByteBuf buf) {
-        NbtCompound compoundTag = buf.readNbt();
+        CompoundTag compoundTag = buf.readCompoundTag();
         if(compoundTag != null) {
             this.fromTag(compoundTag);
         }

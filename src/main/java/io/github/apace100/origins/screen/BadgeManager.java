@@ -46,7 +46,8 @@ public class BadgeManager {
                     autoBadge = Badge.ACTIVE;
                 }
                 if(autoBadge == null) {
-                    if(powerType instanceof MultiplePowerType<?> mp) {
+                    if(powerType instanceof MultiplePowerType<?>) {
+                        MultiplePowerType<?> mp = (MultiplePowerType<?>) powerType;
                         for(Identifier subPower : mp.getSubPowers()) {
                             if(PowerTypeRegistry.contains(subPower)) {
                                 Power sp = PowerTypeRegistry.get(subPower).create(null);

@@ -18,7 +18,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.util.InputUtil;
@@ -40,7 +40,7 @@ public class OriginsClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TEMPORARY_COBWEB, RenderLayer.getCutout());
 
         EntityRendererRegistry.INSTANCE.register(ModEntities.ENDERIAN_PEARL,
-            (context) -> new FlyingItemEntityRenderer(context));
+            (dispatcher, context) -> new FlyingItemEntityRenderer(dispatcher, context.getItemRenderer()));
 
         ModPacketsS2C.register();
 
@@ -66,7 +66,7 @@ public class OriginsClient implements ClientModInitializer {
         ClientTickEvents.START_CLIENT_TICK.register(tick -> {
             while(viewCurrentOriginKeybind.wasPressed()) {
                 if(!(MinecraftClient.getInstance().currentScreen instanceof ViewOriginScreen)) {
-                    MinecraftClient.getInstance().setScreen(new ViewOriginScreen());
+                    MinecraftClient.getInstance().openScreen(new ViewOriginScreen());
                 }
             }
         });

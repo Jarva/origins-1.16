@@ -35,8 +35,8 @@ public class ViewOriginScreen extends OriginDisplayScreen {
 		origins.forEach((layer, origin) -> {
 			ItemStack displayItem = origin.getDisplayItem();
 			if(displayItem.getItem() == Items.PLAYER_HEAD) {
-				if(!displayItem.hasNbt() || !displayItem.getNbt().contains("SkullOwner")) {
-					displayItem.getOrCreateNbt().putString("SkullOwner", player.getDisplayName().getString());
+				if(!displayItem.hasTag() || !displayItem.getTag().contains("SkullOwner")) {
+					displayItem.getOrCreateTag().putString("SkullOwner", player.getDisplayName().getString());
 				}
 			}
 			if((origin != Origin.EMPTY || layer.getOriginOptionCount(player) > 0) && !layer.isHidden()) {
@@ -61,19 +61,19 @@ public class ViewOriginScreen extends OriginDisplayScreen {
 	protected void init() {
 		super.init();
         if(originLayers.size() > 0 && OriginsClient.isServerRunningOrigins) {
-			addDrawableChild(chooseOriginButton = new ButtonWidget(guiLeft + windowWidth / 2 - 50, guiTop + windowHeight - 40, 100, 20, new TranslatableText(Origins.MODID + ".gui.choose"), b -> {
-				MinecraftClient.getInstance().setScreen(new ChooseOriginScreen(Lists.newArrayList(originLayers.get(currentLayer).getLeft()), 0, false));
+			addButton(chooseOriginButton = new ButtonWidget(guiLeft + windowWidth / 2 - 50, guiTop + windowHeight - 40, 100, 20, new TranslatableText(Origins.MODID + ".gui.choose"), b -> {
+				MinecraftClient.getInstance().openScreen(new ChooseOriginScreen(Lists.newArrayList(originLayers.get(currentLayer).getLeft()), 0, false));
 			}));
 			PlayerEntity player = MinecraftClient.getInstance().player;
 			chooseOriginButton.active = chooseOriginButton.visible = originLayers.get(currentLayer).getRight() == Origin.EMPTY && originLayers.get(currentLayer).getLeft().getOriginOptionCount(player) > 0;
 			if(originLayers.size() > 1) {
-				addDrawableChild(new ButtonWidget(guiLeft - 40,this.height / 2 - 10, 20, 20, new LiteralText("<"), b -> {
+				addButton(new ButtonWidget(guiLeft - 40,this.height / 2 - 10, 20, 20, new LiteralText("<"), b -> {
 					currentLayer = (currentLayer - 1 + originLayers.size()) % originLayers.size();
 					Pair<OriginLayer, Origin> current = originLayers.get(currentLayer);
 					showOrigin(current.getRight(), current.getLeft(), false);
 					chooseOriginButton.active = chooseOriginButton.visible = current.getRight() == Origin.EMPTY && current.getLeft().getOriginOptionCount(player) > 0;
 				}));
-				addDrawableChild(new ButtonWidget(guiLeft + windowWidth + 20, this.height / 2 - 10, 20, 20, new LiteralText(">"), b -> {
+				addButton(new ButtonWidget(guiLeft + windowWidth + 20, this.height / 2 - 10, 20, 20, new LiteralText(">"), b -> {
 					currentLayer = (currentLayer + 1) % originLayers.size();
 					Pair<OriginLayer, Origin> current = originLayers.get(currentLayer);
 					showOrigin(current.getRight(), current.getLeft(), false);
@@ -81,8 +81,8 @@ public class ViewOriginScreen extends OriginDisplayScreen {
 				}));
 			}
 		}
-		addDrawableChild(new ButtonWidget(guiLeft + windowWidth / 2 - 50, guiTop + windowHeight + 5, 100, 20, new TranslatableText(Origins.MODID + ".gui.close"), b -> {
-			MinecraftClient.getInstance().setScreen(null);
+		addButton(new ButtonWidget(guiLeft + windowWidth / 2 - 50, guiTop + windowHeight + 5, 100, 20, new TranslatableText(Origins.MODID + ".gui.close"), b -> {
+			MinecraftClient.getInstance().openScreen(null);
         }));
 	}
 	
@@ -91,9 +91,9 @@ public class ViewOriginScreen extends OriginDisplayScreen {
 		super.render(matrices, mouseX, mouseY, delta);
 		if(originLayers.size() == 0) {
 			if(OriginsClient.isServerRunningOrigins) {
-				drawCenteredText(matrices, this.textRenderer, new TranslatableText(Origins.MODID + ".gui.view_origin.empty").getString(), width / 2, guiTop + 48, 0xFFFFFF);
+				drawCenteredText(matrices, this.textRenderer, new TranslatableText(Origins.MODID + ".gui.view_origin.empty"), width / 2, guiTop + 48, 0xFFFFFF);
 			} else {
-				drawCenteredText(matrices, this.textRenderer, new TranslatableText(Origins.MODID + ".gui.view_origin.not_installed").getString(), width / 2, guiTop + 48, 0xFFFFFF);
+				drawCenteredText(matrices, this.textRenderer, new TranslatableText(Origins.MODID + ".gui.view_origin.not_installed"), width / 2, guiTop + 48, 0xFFFFFF);
 			}
 		}
 	}

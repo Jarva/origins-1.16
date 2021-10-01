@@ -82,7 +82,7 @@ public class ModPacketsS2C {
                 }
             });
             Collections.sort(layers);
-            minecraftClient.setScreen(new ChooseOriginScreen(layers, 0, showDirtBackground));
+            minecraftClient.openScreen(new ChooseOriginScreen(layers, 0, showDirtBackground));
         });
     }
 
